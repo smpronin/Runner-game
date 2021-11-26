@@ -1,21 +1,18 @@
 'use strict';
 
 document.addEventListener('keydown', keyDownHandler, false);
+document.addEventListener('keyup', keyUpHandler, false);
 
 function keyDownHandler(e) {
     // console.log(e);
     if (e.code == 'Space') {
-
+        player.jump = true;
     }
 }
 
-function drawBrick(brick) {
-    ctx.beginPath();
-    ctx.rect(brick.x, brick.y, brick.width, brick.height);
-    ctx.fillStyle = brick.fillStyle;
-    ctx.strokeStyle = brick.strokeStyle;
-    ctx.lineWidth = brick.lineWidth;
-    ctx.fill();
-    ctx.stroke();
-    ctx.closePath();
+function keyUpHandler(e) {
+    // console.log(e);
+    if (e.code == 'Space') {
+        player.jump = false;
+    }
 }

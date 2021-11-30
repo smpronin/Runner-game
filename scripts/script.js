@@ -11,6 +11,7 @@ class Hero {
         this.width = 10;
         this.height = 30;
         this.jump = false;
+        this.inAir = false;
         this.lineWidth = 1;
         this.fillStyle = '#FFFFFF';
         this.strokeStyle = '#000000';
@@ -66,7 +67,6 @@ image.background.init('images/Background.png');
 
 let player = new Hero();
 
-
 function draw() {
     // Перемещение задника
     image.background.dx += image.background.vx
@@ -74,28 +74,26 @@ function draw() {
         image.background.dx = 0;
     }
 
-    if (player.jump == true) {
-        player.vy -= 4;
+    if(player.y < player.y0) {
+        player.inAir = true
+    } else {player.inAir = false}
+    
+    if (player.jump == true && player.inAir == false) {
+        player.vy -= 20;
+        player.jump = false;
     }
 
     player.y += player.vy;
 
     player.vy += 1;
 
-    // player.y >= player.y0 ? player.y = player.y0 : player.vy += 1;
+
     if (player.y >= player.y0) {
         player.y = player.y0;
         player.vy = 0;
     } else if (player.y < player.y0 && player.jump == false) {
         player.vy += 1;
     }
-
-    /* if(player.y < player.y0) {
-        player.vy += 1;
-        player.y += player.vy;
-    } else {
-        player.y = player.y0
-    } */
 
     image.background.draw();
     player.draw();

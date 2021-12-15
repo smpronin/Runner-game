@@ -6,13 +6,13 @@ document.addEventListener('keyup', keyUpHandler, false);
 function keyDownHandler(e) {
     // console.log(e);
     if (e.code == 'Space') {
-        player.jump = true;
+        control.jump = true;
     }
 }
 
 function keyUpHandler(e) {
     // console.log(e);
     if (e.code == 'Space') {
-        player.jump = false;
+        control.jump = false;
     }
 }

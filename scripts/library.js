@@ -8,6 +8,10 @@ function keyDownHandler(e) {
     if (e.code == 'Space') {
         control.jump = true;
     }
+
+    if (e.code == 'ArrowRight') {
+        control.stepRequest = true;
+    }
 }
 
 function keyUpHandler(e) {

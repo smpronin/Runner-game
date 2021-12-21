@@ -4,7 +4,8 @@ let canvas = document.getElementById('canvas1');
 let ctx = canvas.getContext('2d');
 
 let control = {
-    jump: false
+    jump: false,
+    stepRequest: false
 }
 
 class Hero {
@@ -116,10 +117,12 @@ class Animation extends Image {
         this.animation = {
             duration: duration,
             length: numberOfFrames,
+            width: null,
+            height: null,
             frame: {
                 number: 0,
-                width: this.width / numberOfFrames,
-                height: this.height
+                width: null, //this.width / numberOfFrames,
+                height: null //this.height
             }
         }
     }
@@ -128,14 +131,26 @@ class Animation extends Image {
 Animation.prototype.init = function (source) {
     this.src = source;
     this.onload = function () {
-        ctx.drawImage(this, 0, 0, this.width, this.height)
+        ctx.drawImage(this, 0, 0, this.width, this.height);
         ctx.clearRect(0, 0, canvas.width, canvas.height);
+        this.animation.width = this.width;
+        this.animation.height = this.height;
+        this.animation.frame.width = this.width / this.animation.length;
+        this.animation.frame.height = this.height;
+        // console.log(this.)
     }
 }
 
+// В целом анимация работает, но какие-то проблемы с размером изображения + нет настройки скорости воспроизведения анимации (Пока не понимаю как это должно работать)
 Animation.prototype.draw = function (x = 0, y = 0) {
-    ctx.drawImage(this, x /* - this.animation.frame.length * this.animation.number */, y, this.width, this.height);
-    // this.animation.number >= this.animation.length ? this.animation.number = 0 : this.animation.number++;
+
+    ctx.drawImage(this, this.animation.frame.width * this.animation.frame.number, 0,
+        this.animation.frame.width, this.animation.frame.height,
+        x, y,
+        this.width, this.height);
+
+    this.animation.frame.number >= this.animation.length - 1 ? this.animation.frame.number = 0 : this.animation.frame.number++;
+
 }
 
 //=============================================================
@@ -155,20 +170,19 @@ image.hero.run.init('images/HeroRun.png');
 let player = new Hero();
 
 
-// Разобраться с определением размеров картинок, не получается произвести расчёты!!!!!!!!!!!!!!!!!!!!
-console.log([image.hero.run]);
-console.log(image.hero.run.height);
-console.log(image.background.height);
-
 function draw() {
 
-    image.hero.run.draw(0, 0);
+    if (control.stepRequest == true) {
 
-    /* ctx.clearRect(0, 0, canvas.width, canvas.height);
-    image.background.move();
-    player.jumpCheck();
-    image.background.draw();
-    player.draw(); */
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        image.hero.run.draw(100, 100);
+        image.background.move();
+        player.jumpCheck();
+        image.background.draw();
+        // player.draw();
+
+        // control.stepRequest = false;
+    }
 
     requestAnimationFrame(draw);
 }

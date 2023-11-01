@@ -5,18 +5,18 @@ document.addEventListener('keyup', keyUpHandler, false);
 
 function keyDownHandler(e) {
     // console.log(e);
-    if (e.code == 'Space') {
-        control.jump = true;
+    if (e.code == gameControl.keys.jump.bind) {
+        gameControl.keys.jump.state = true;
     }
 
-    if (e.code == 'ArrowRight') {
-        control.stepRequest = true;
-    }
+    // if (e.code == 'ArrowRight') {
+    //     // control.frameRequest = true;
+    // }
 }
 
 function keyUpHandler(e) {
     // console.log(e);
-    if (e.code == 'Space') {
-        control.jump = false;
+    if (e.code == gameControl.keys.jump.bind) {
+        gameControl.keys.jump.state = false;
     }
 }

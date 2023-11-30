@@ -4,6 +4,9 @@ let canvas = document.getElementById('canvas1');
 let ctx = canvas.getContext('2d');
 
 let gameControl = {
+    status: 1,
+    distance: 0,
+    enemyArray: [],
     keys: {
         jump: {
             bind: 'Space',
@@ -40,11 +43,10 @@ let gameControl = {
                     gameControl.frames.fps.history.shift();
                     gameControl.frames.fps.history.push(gameControl.frames.fps.current);
                 }
-                // console.log(gameControl.frames.fps.history)
             }
 
             let sum = 0;
-            let length = gameControl.frames.fps.history.length; //Math.min(gameControl.frames.fps.history.length, 10);
+            let length = gameControl.frames.fps.history.length;
             for (let i = 0; i <= length - 1; i++) {
                 sum += gameControl.frames.fps.history[i];
             }
@@ -75,6 +77,7 @@ class Hero {
         this.lineWidth = 1;
         this.fillStyle = '#FFFFFF';
         this.strokeStyle = '#000000';
+        this.alive = true;
     }
 
     jumpCheck() {
@@ -194,18 +197,78 @@ class Animation extends Image {
 }
 
 class Text {
-    constructor(x, y, text) {
+    constructor(x, y, text, maxWidth) {
         this.x = x;
         this.y = y;
         this.text = text;
         this.font = '40px serif';
         this.fillStyle = '#35A1FF';
-        this.maxWidth = 100;
+        this.maxWidth = maxWidth;
     }
     draw(text) {
         ctx.font = this.font;
         ctx.fillStyle = this.fillStyle;
         ctx.fillText(text, this.x, this.y, this.maxWidth);
+    }
+
+}
+
+class Wall {
+    constructor(x, y, width, height, vx = 1) {
+        this.x = x;
+        this.distanceTraveled = 0;
+        this.vx = vx;
+        this.y = y;
+        this.width = width;
+        this.height = height;
+        this.spawnRate = 0.1;
+        this.alive = true;
+        this.groupArr = 'enemyArray';
+        this.fillStyle = '#FFFFFF';
+        this.strokeStyle = '#000000';
+    }
+    draw() {
+        ctx.beginPath();
+        ctx.rect(this.x, this.y, this.width, this.height);
+        ctx.fillStyle = this.fillStyle;
+        ctx.strokeStyle = this.strokeStyle;
+        ctx.lineWidth = this.lineWidth;
+        ctx.fill();
+        ctx.stroke();
+        ctx.closePath();
+    }
+    init() {
+        let wall = new Wall(canvas.width, canvas.height - 172, 10, 30)
+        // let wall = new Wall(100, canvas.height - 172, 10, 30)
+        if (typeof gameControl[this.groupArr] == 'undefined') {
+            gameControl[this.groupArr] = [wall];
+        } else {
+            gameControl[this.groupArr].push(wall);
+        }
+    }
+    move() {
+        this.x -= this.vx;
+        this.distanceTraveled += 1;
+        // console.log('Enemy num: ', gameControl.enemyArray.length);
+        new Wall().despawn();
+    }
+    spawn() {
+        let spawnDistance = 100;
+        let wall = new Wall(canvas.width, canvas.height - 172, 10, 30);
+        if (gameControl[this.groupArr].length == 0) {
+            gameControl[this.groupArr].push(wall);
+        } else if (gameControl[this.groupArr][gameControl[this.groupArr].length - 1].distanceTraveled >= spawnDistance
+            && Math.random() <= 0.01) {
+            gameControl[this.groupArr].push(wall);
+        }
+    }
+    despawn() {
+        for (let i = 0; i <= gameControl[this.groupArr].length - 1; i++) {
+            if (gameControl[this.groupArr][i].x <= -20) {
+                gameControl[this.groupArr].shift();
+            }
+        }
+        // console.log(gameControl[this.groupArr].length);
     }
 
 }
@@ -223,22 +286,31 @@ image.background.init('images/Background.png');
 image.hero.run.init('images/HeroRun.png');
 
 
-
 let player = new Hero();
-let fpsCounter = new Text(canvas.width - 110, 50, 'fps: ');
+let fpsCounter = new Text(canvas.width - 130, 50, 'fps: ');
+let distanceCounter = new Text(30, 50, 'Distance: ');
 
+
+console.log(gameControl);
 
 function draw() {
 
     if (gameControl.frames.frameRequest()) {
-
+        gameControl.distance += image.background.vx / 100;
+        new Wall().spawn();
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         // image.hero.run.draw(100, 100);
-        image.background.move();
         player.jumpCheck();
         image.background.draw();
+        image.background.move();
+        for (let i = 0; i <= gameControl.enemyArray.length - 1; i++) {
+            gameControl.enemyArray[i].draw();
+            gameControl.enemyArray[i].move();
+        }
         player.draw();
         fpsCounter.draw('fps: ' + gameControl.frames.fps.avg);
+        distanceCounter.draw('Distance: ' + Math.floor(gameControl.distance));
+
     }
 
 

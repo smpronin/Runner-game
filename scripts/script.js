@@ -123,6 +123,23 @@ class Hero {
         ctx.fill();
         ctx.stroke();
         ctx.closePath();
+        // new Hero().enemyHitCheck();
+    }
+
+    enemyHitCheck() {
+        for (let i = 0; i <= gameControl.enemyArray.length - 1; i++) {
+            if (
+                gameControl.enemyArray[i].y < this.y + this.height &&
+                gameControl.enemyArray[i].y > this.y - gameControl.enemyArray[i].height &&
+                gameControl.enemyArray[i].x < this.x + this.width &&
+                gameControl.enemyArray[i].x > this.x - gameControl.enemyArray[i].width &&
+                gameControl.enemyArray[i].alive == true
+            ) {
+                gameControl.enemyArray[i].alive = false;
+                // console.log('Hit!!!', gameControl.enemyArray[i].y, gameControl.enemyArray[i].x, this.y + this.height, this.y - gameControl.enemyArray[i].height, this.x + this.width, this.x - gameControl.enemyArray[i].width);
+                gameControl.enemyArray[i].fillStyle = gameControl.enemyArray[i].deadStyle;
+            }
+        }
     }
 }
 
@@ -225,6 +242,7 @@ class Wall {
         this.alive = true;
         this.groupArr = 'enemyArray';
         this.fillStyle = '#FFFFFF';
+        this.deadStyle = '#FF0000';
         this.strokeStyle = '#000000';
     }
     draw() {
@@ -265,12 +283,11 @@ class Wall {
     despawn() {
         for (let i = 0; i <= gameControl[this.groupArr].length - 1; i++) {
             if (gameControl[this.groupArr][i].x <= -20) {
-                gameControl[this.groupArr].shift();
+                gameControl[this.groupArr].splice(i, 1);
             }
         }
         // console.log(gameControl[this.groupArr].length);
     }
-
 }
 
 //=============================================================
@@ -307,6 +324,7 @@ function draw() {
             gameControl.enemyArray[i].draw();
             gameControl.enemyArray[i].move();
         }
+        player.enemyHitCheck();
         player.draw();
         fpsCounter.draw('fps: ' + gameControl.frames.fps.avg);
         distanceCounter.draw('Distance: ' + Math.floor(gameControl.distance));
